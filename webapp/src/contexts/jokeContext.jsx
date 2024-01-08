@@ -43,33 +43,38 @@ const ProviderWrapper = ({ children }) => {
     const newScores = scores.concat({
       username: username,
       date: new Date().toISOString(),
-      score: newScore, // Assurez-vous d'utiliser la bonne propriété pour la valeur du score
-      joke: id, // Assurez-vous d'utiliser la bonne propriété pour l'ID de la blague
+      score: newScore, 
+      joke: id, 
     });
 
     setScores(newScores);
   };
 
-  const getJokeWithScores = (id) => {
-    const selectedJoke = getJokesWithScores().find((joke) => joke.id === id);
-    const jokeScores = scores.filter((score) => score.joke === id);
-    
-    // Trier d'abord par score décroissants
-    jokeScores.sort((a, b) => b.value - a.value);
+  const getJokeWithScores = (jokeId) => {
+    const joke = jokes.find((joke) => joke.id === jokeId);
 
-    // Ensuite, trier par date la plus récente en cas d'égalité de score
-    jokeScores.sort((a, b) => {
-      if (a.value === b.value) {
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-      }
-      return 0; // Le tri par score a déjà été effectué
-    });
+    if (!joke) {
+        return null;
+    }
+
+    const jokeScores = scores.filter((score) => score.joke === jokeId);
+
+    const scoreCount = jokeScores.length;
+    const averageScore =
+        scoreCount > 0
+            ? jokeScores.reduce((acc, score) => acc + score.score, 0) / scoreCount
+            : 0;
 
     return {
-      ...selectedJoke,
-      scores: jokeScores,
+        question: joke.question,
+        answer: joke.answer,
+        category: joke.category,
+        id: joke.id,
+        scores: jokeScores,
+        scoreCount,
+        averageScore,
     };
-  };
+};
 
   const exposedValue = {
     jokes: getJokesWithScores(),

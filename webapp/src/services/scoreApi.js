@@ -3,34 +3,10 @@ import axios from "axios";
 const baseUrl = 'http://localhost:3001/api/scores';
 
 
-const addOneScore = async (score) => {
-    const postHeader = {
-      headers: {
-        'Content-Type': 'application/json',
-      }
-      
-    }
-    const request = axios.post(baseUrl, score, postHeader)
-    try {
-        const response = await request;
-        return response.data[0];
-    } catch (error) {
-        console.log('fail :', error);
-    }
-  }
+const addOneScore = (score) => axios.post(`${baseUrl}`, score).then(response => response.data);
 
-  
+const getAllScores = () => axios.get(`${baseUrl}`).then(response => response.data);
 
-const getAllScores = () => {
-    const request = axios.get(baseUrl)
-    return request
-        .then(response => {
-            return response.data
-        })
-        .catch(error => {
-            console.log('fail :', error)
-        })
-}
+const scoreApi = { addOneScore, getAllScores };
 
-
-export default { addOneScore, getAllScores }
+export default scoreApi;

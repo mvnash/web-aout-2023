@@ -2,50 +2,16 @@ import axios from "axios";
 
 const baseUrl = "http://localhost:3001/api/jokes";
 
-const addOneJoke = (joke) => {
-  const postHeader = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  };
-  const request = axios.post(baseUrl, joke, postHeader);
-  return request
-    .then((response) => {
-      return response.data[0];
-    })
-    .catch((error) => {
-      console.log("fail :", error);
-    });
-};
 
-const getAllJokes = () => {
-  const request = axios.get(baseUrl);
-  return request
-    .then((response) => {
-      console.log(response.data);
-      return response.data;
-    })
-    .catch((error) => {
-      console.log("fail :", error);
-    });
-};
+const addOneJoke = (joke) => axios.post(`${baseUrl}`, joke).then(response => response.data);
 
-const getOneJoke = (id) => {
-  const request = axios.get(baseUrl.concat(`/${id}`));
-  return request
-    .then((response) => {})
-    .catch((error) => {
-      console.log("fail :", error);
-    });
-};
+const getAllJokes = () => axios.get(`${baseUrl}`).then(response => response.data);
 
-const deleteOneJoke = (id) => {
-  const request = axios.delete(baseUrl.concat(`/${id}`));
-  return request
-    .then((response) => {})
-    .catch((error) => {
-      console.log("fail :", error);
-    });
-};
+const getOneJoke = (id) => axios.get(`${baseUrl}/${id}`).then(response => response.data);
 
-export default { addOneJoke, getAllJokes, getOneJoke, deleteOneJoke };
+const deleteOneJoke = (id) => axios.delete(`${baseUrl}/${id}`).then(response => response.data);
+
+
+const jokeApi = { addOneJoke, getAllJokes, getOneJoke, deleteOneJoke };
+
+export default jokeApi;
