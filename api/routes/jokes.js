@@ -3,59 +3,68 @@ const Joke = require("../models/joke");
 const NotFoundError = require("../utils/NotFoundError");
 
 // Read all
-router.get("/", (req, res, next) => {
-  Joke.find({})
-    .then((jokes) => res.json(jokes))
-    .catch((err) => next(err));
-});
+router.get('/', async (req, res) => {
+  try {
+      const jokes = await Joke.find({});
+      return res.json(jokes)
+  } catch (error) {
+      return res.status(500).json({ error: error.message })
+  }
+})
 
 // Read by ID
-router.get("/:id", (req, res, next) => {
-  Joke.findById(req.params.id)
-    .then((joke) => {
-      if (joke) {
-        res.json(joke);
-      } else {
-        throw new NotFoundError();
+router.get('/:id', async (req, res) => {
+  try {
+      const joke = await Joke.findById(req.params.id)
+      
+      if (!joke) {
+          return res.status(404).json({ error: 'joke not found' })
       }
-    })
-    .catch((err) => next(err));
-});
+
+      return res.json(joke)
+  } catch (error) {
+      return res.status(500).json({ error: error.message })
+  }
+})
 
 // Delete one
-router.delete("/:id", (req, res, next) => {
-  Joke.findByIdAndRemove(req.params.id)
-    .then((result) => {
-      if (result) {
-        res.json(result);
-      } else {
-        throw new NotFoundError();
-      }
-    })
-    .catch((err) => next(err));
-});
+router.delete('/:id', async (req, res) => {
+  try {
+      const joke = await Joke.findByIdAndDelete(req.params.id)
+      return res.status(200).json(joke)
+  } catch (error) {
+      return res.status(500).json({ error: error.message })
+  }
+})
 
 // Create one
-router.post("/", (req, res, next) => {
-  const body = req.body;
-  // Check body
-  const errorMessages = [];
-  if (!body.question || body.question.length < 3) errorMessages.push("question must be presen and should be at least 3 char");
-  if (!body.answer || body.answer.length < 3) errorMessages.push("answer must be present and should be at least 3 char");
-  if (!body.category || body.category.length < 3) errorMessages.push("category must be present and should be at least 3 char");
-  if (errorMessages.length > 0) {
-    res.status(422).json({ errorMessages });
-    return;
+router.post('/', async (req, res) => {
+  const { question, answer, category } = req.body
+
+  if (!question || !answer || !category) {
+      return res.status(400).json({ error: 'question, answer, and category are required' })
   }
 
-  // Insert
-  const joke = new Joke(body);
-  joke
-    .save()
-    .then((result) => {
-      res.json(result);
-    })
-    .catch((err) => next(err));
+  if (question.length < 3) {
+      return res.status(400).json({ error: 'question must be at least 10 characters' })
+  }
+
+  if (answer.length < 3) {
+      return res.status(400).json({ error: 'answer must be at least 10 characters' })
+  }
+
+  if (category.length < 3) {
+      return res.status(400).json({ error: 'category must be at least 10 characters' })
+  }
+
+  try {
+      const joke = new Joke({ question, answer, category })
+      joke.save().then(() => {
+          return res.status(201).json(joke)
+      })
+  } catch (error) {
+      return res.status(500).json({ error: error.message })
+  }
 });
 
 module.exports = router;

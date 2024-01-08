@@ -3,64 +3,44 @@ const Score = require("../models/score");
 const NotFoundError = require("../utils/NotFoundError");
 
 // Read all
-router.get("/", (req, res, next) => {
-  Score.find({})
-    .then((scores) => res.json(scores))
-    .catch((err) => next(err));
-});
+router.get('/', async (req, res) => {
+  try {
+      const scores = await Score.find({});
+      return res.json(scores)
+  } catch (error) {
+      return res.status(500).json({ error: error.message })
+  }
+})
 
 // Create one
-router.post("/", async (req, res, next) => {
-  const body = req.body;
-  // Check body
-  const errorMessages = [];
-  if (!body.username || body.username.length < 3) errorMessages.push("username must be present and should be at least 3 char");
-  if (!body.date) errorMessages.push("date must be present");
-  if (!body.score) errorMessages.push("score must be present");
-  if (!body.joke) {
-    errorMessages.push("joke must be present");
-  } else {
-    // Check if the associated joke exists in the database
-    try {
-      const existingJoke = Joke.findById(body.joke);
-      if (!existingJoke) {
-        errorMessages.push(
-          "The associated joke does not exist in the database"
-        );
-        res.status(409).json({ errorMessages });
-        return;
-      }
-    } catch (err) {
-      next(err);
-      return;
-    }
+router.post('/', async (req, res) => {
+  const { username, score, joke } = req.body
 
-    // Check if the user has already given a score to this joke
-    try {
-      const existingScore = await Score.findOne({
-        username: body.username,
-        joke: body.joke,
-      });
-      if (existingScore) {
-        errorMessages.push("The user has already given a score to this joke");
-        res.status(401).json({ errorMessages });
-        return;
-      }
-    } catch (err) {
-      next(err);
-      return;
-    }
+  if (!username || !score || !joke) {
+      return res.status(400).json({ error: 'username, date, score, and joke are required' })
   }
 
-  if (errorMessages.length > 0) {
-    res.status(422).json({ errorMessages });
-    return;
+  if (username.length < 3) {
+      return res.status(400).json({ error: 'username must be at least 3 characters' })
   }
 
-  // Insert
-  const scores = await Score.create(body);
+  const scoreFound = await Score.find({ username, joke });
+  if (scoreFound.length > 0) {
+      return res.status(400).json({ error: 'username and joke already exists' })
+  }
 
-  res.json(scores);
-});
+  const jokeExists = await Joke.findById(joke)
+  if (!jokeExists) {
+      return res.status(404).json({ error: 'joke does not exist' })
+  }
+
+  try {
+      const saveScore = new Score({ username , score, joke })
+      await saveScore.save()
+      return res.status(201).json({ saveScore })
+  } catch (error) {
+      return res.status(500).json({ error: error.message })
+  }
+})
 
 module.exports = router;

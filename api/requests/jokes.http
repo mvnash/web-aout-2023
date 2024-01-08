@@ -1,22 +1,27 @@
-### Get all jokes
-GET http://localhost:3001/jokes
+@hostname = localhost
+@port = 3001
+@host = http://{{hostname}}:{{port}}
+@jokeId = 6599850700b3c8369f05b21a
 
-### Get a joke by id
-GET http://localhost:3001/jokes/658c59bb6061fc9976f222f6
-
-### Create a joke
-# @name create
-POST http://localhost:3001/jokes
+### Create
+POST {{host}}/api/jokes HTTP/1.1
+Accept: application/json
 Content-Type: application/json
 
 {
-    "question": "What do you call a cow with no legs?",
-    "answer": "Ground beef",
-    "category": "animal"
-}
+  "question": "hello?",
+  "answer": "hello ahah!",
+  "category": "fun"
+  }
 
-### Update a joke by id
-@jokeId = {{ create.response.body.id }}
+### Delete
+DELETE {{host}}/api/jokes/{{jokeId}} HTTP/1.1
+Accept: application/json
 
-### Delete a joke by id
-DELETE http://localhost:3001/jokes/{{ jokeId }}
+### Read All
+GET {{host}}/api/jokes HTTP/1.1
+Accept: application/json
+
+### Read by Id
+GET {{host}}/api/jokes/{{jokeId}} HTTP/1.1
+Accept: application/json
