@@ -4,11 +4,11 @@ import App from "components/App/App";
 
 const AppLoader = () => {
   return (
-    <Router>
-      <ProviderWrapper>
+    <ProviderWrapper>
+      <Router>
         <App />
-      </ProviderWrapper>
-    </Router>
+      </Router>
+    </ProviderWrapper>
   );
 };
 
