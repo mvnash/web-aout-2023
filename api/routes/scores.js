@@ -58,13 +58,9 @@ router.post("/", async (req, res, next) => {
   }
 
   // Insert
-  const score = new Score(body);
-  score
-    .save()
-    .then((result) => {
-      res.json(result);
-    })
-    .catch((err) => next(err));
+  const scores = await Score.create(body);
+
+  res.json(scores);
 });
 
 module.exports = router;

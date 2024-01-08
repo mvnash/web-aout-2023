@@ -1,24 +1,21 @@
 const mongoose = require('mongoose')
 
-
-
-// Define Schema
-const scoreSchema = new mongoose.Schema({
+const ScoreSchema = new mongoose.Schema({
     username: String,
-    date: Date,
+    date: {
+        type: Date,
+        default: Date.now
+    },
     score: Number,
-    joke: mongoose.Schema.Types.ObjectId,
+    joke: { type: mongoose.Schema.Types.ObjectId, ref: 'Joke' }
 })
 
-scoreSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
-  }
+ScoreSchema.set('toJSON', {
+    transform: (doc, ret) => {
+        ret.id = doc._id
+        delete ret._id
+        delete ret.__v
+    }
 })
 
-
-
-// Export model
-module.exports = mongoose.model('Score', scoreSchema)
+module.exports = mongoose.model('Score', ScoreSchema)

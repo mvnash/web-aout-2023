@@ -1,9 +1,0 @@
-@hostname = localhost
-@port = 3001
-@jokeId = 6461f476d9a9da9dbeade34e
-@host = http://{{hostname}}:{{port}}
-
-###
-
-GET {{host}}/api/jokes/{{jokeId}} HTTP/1.1
-Accept: application/json
